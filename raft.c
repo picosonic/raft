@@ -23,8 +23,6 @@ int transferfile(ssh_session session, const char *localpath, const char *remotep
   int rc;
   struct stat localstat;
   FILE *fp;
-  unsigned char buffer[BLOCKSIZE];
-  size_t remaining;
 
   // Check local file exists and get file stats
   rc=stat(localpath, &localstat);
@@ -60,7 +58,7 @@ int transferfile(ssh_session session, const char *localpath, const char *remotep
   if (fp!=NULL)
   {
     struct timeval timestamps[2];
-    remaining=localstat.st_size;
+    size_t remaining=localstat.st_size;
 
     // Open remote file for writing
     file=sftp_open(sftp, remotepath, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
@@ -84,6 +82,7 @@ int transferfile(ssh_session session, const char *localpath, const char *remotep
     // Loop until whole of local file is read
     while (remaining>0)
     {
+      unsigned char buffer[BLOCKSIZE];
       size_t numread;
       size_t numwritten;
 
@@ -97,6 +96,8 @@ int transferfile(ssh_session session, const char *localpath, const char *remotep
       {
         // Close remote file
         rc=sftp_close(file);
+        if (rc!=SSH_NO_ERROR)
+          fprintf(stderr, "Error closing remote file: %s\n", ssh_get_error(session));
 
         // Delete the broken remote file
         //rc=sftp_unlink(sftp, remotepath);
@@ -115,6 +116,8 @@ int transferfile(ssh_session session, const char *localpath, const char *remotep
 
     // Close remote file
     rc=sftp_close(file);
+    if (rc!=SSH_NO_ERROR)
+      fprintf(stderr, "Error closing remote file: %s\n", ssh_get_error(session));
 
     // Close local file
     fclose(fp);
@@ -146,7 +149,6 @@ int runcommand(ssh_session session, const char *cmdstr)
   ssh_channel channel;
   int rc;
   char buffer[256];
-  int nbytes;
 
   channel=ssh_channel_new(session);
   if (channel==NULL)
@@ -169,6 +171,8 @@ int runcommand(ssh_session session, const char *cmdstr)
 
   while ((ssh_channel_is_open(channel)) && (!ssh_channel_is_eof(channel)))
   {
+    int nbytes;
+
     // Blocking read
     nbytes=ssh_channel_read(channel, buffer, sizeof(buffer), 0);
 
@@ -374,7 +378,12 @@ int main(int argc, char **argv)
 
   // Run a remote command and return the response
   if (commandstr[0]!=0)
+  {
     rc=runcommand(session, commandstr);
+
+    if (rc!=SSH_OK)
+      fprintf(stderr, "Failed to run remote command: %s\n", ssh_get_error(session));
+  }
 
   if (verbose==1)
     fprintf(stderr, "Disconnecting\n");
