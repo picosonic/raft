@@ -7,7 +7,7 @@ all: raft
 raft: raft.o
 	$(CC) -g -o raft raft.o -lssh
 
-raft.o: raft.c
+raft.o: raft.c b64.h
 	$(CC) $(BUILDFLAGS) -c -o raft.o raft.c
 
 clean:

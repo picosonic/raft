@@ -12,6 +12,8 @@
 #include <libssh/libssh.h>
 #include <libssh/sftp.h>
 
+#include "b64.h"
+
 #define BLOCKSIZE (10*1024)
 
 int verbose=0;
@@ -275,6 +277,21 @@ int main(int argc, char **argv)
     {
       ++argn;
       strcpy(commandstr, argv[argn]);
+    }
+    else
+    if ((strcmp(argv[argn], "-c64")==0) && ((argn+1)<argc))
+    {
+      char *decoded;
+
+      ++argn;
+
+      decoded=strdup(argv[argn]);
+      if (decoded!=NULL)
+      {
+        b64_decode_string(argv[argn], decoded, strlen(argv[argn]));
+        strcpy(commandstr, decoded);
+        free(decoded);
+      }
     }
     else
     if ((strcmp(argv[argn], "-l")==0) && ((argn+1)<argc))
