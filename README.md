@@ -13,7 +13,7 @@ For example, the `ls -l` command can be bas64 encoded with : `echo -n "ls -l" | 
 
 ## Syntax :
 
-`raft [-h [username@]remotehost] [-i identityfile] [-p password] [-c "shell command"] [-l localfilename] [-r remotefilename] [-z] [-v]`
+`raft [-h [username@]remotehost] [-i identityfile] [-p password] [-c "shell command"] [-c64 "base64 encoded shell command"] [-l localfilename] [-r remotefilename] [-z] [-v]`
 
 ## Where :
 
