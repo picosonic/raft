@@ -209,7 +209,7 @@ int runcommand(ssh_session session, const char *cmdstr)
 void showargs()
 {
   fprintf(stderr, "raft - Remote Administration File Transfer\n\n");
-  fprintf(stderr, "Syntax : [-h [username@]remotehost] [-i identityfile] [-p password] [-c \"shell command\"] [-l localfilename] [-r remotefilename] [-z] [-v]\n");
+  fprintf(stderr, "Syntax : [-h [username@]remotehost] [-i identityfile] [-p password] [-c \"shell command\"] [-c64 \"base64 encoded shell command\"] [-l localfilename] [-r remotefilename] [-z] [-v]\n");
 }
 
 int main(int argc, char **argv)
