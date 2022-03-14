@@ -383,14 +383,16 @@ int main(int argc, char **argv)
 
   // Do local to remote file transfer
   if ((localpath[0]!=0) && (remotepath[0]!=0))
+  {
     rc=transferfile(session, localpath, remotepath);
 
-  if (rc!=SSH_OK)
-  {
-    fprintf(stderr, "File transfer failed: %s\n", ssh_get_error(session));
-    ssh_disconnect(session);
-    ssh_free(session);
-    exit(5);
+    if (rc!=SSH_OK)
+    {
+      fprintf(stderr, "File transfer failed: %s\n", ssh_get_error(session));
+      ssh_disconnect(session);
+      ssh_free(session);
+      exit(5);
+    }
   }
 
   // Run a remote command and return the response
